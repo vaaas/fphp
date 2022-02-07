@@ -57,7 +57,7 @@ class FP {
     }
 
     static function do_nothing() {
-        return FP::K(false);
+        return false;
     }
 
     static function get(...$ks): callable {
