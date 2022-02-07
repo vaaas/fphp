@@ -9,6 +9,8 @@
         }
     ],
     "autoload": {
-        "FPHP\\FP": "FP.php"
+        "files": [
+            "FP.php"
+        ]
     }
 }
