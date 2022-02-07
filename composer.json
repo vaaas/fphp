@@ -1,0 +1,14 @@
+{
+    "name": "fphp/fp",
+    "description": "functional programming utilities for PHP",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Vasileios Pasialiokis",
+            "email": "pasivasi@outlook.com"
+        }
+    ],
+    "autoload": {
+        "FPHP\\FP": "FP.php"
+    }
+}
