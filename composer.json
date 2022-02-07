@@ -9,8 +9,8 @@
         }
     ],
     "autoload": {
-        "files": [
-            "FP.php"
-        ]
+        "psr-4": {
+            "FPHP\\": ""
+        }
     }
 }
