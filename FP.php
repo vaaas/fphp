@@ -194,7 +194,12 @@ class FP {
 
     static function filter_array(callable $f): callable {
         return function (array $x) use ($f): array {
-            return array_filter($f, $x);
+            $r = [];
+            for ($i = 0, $len = count($x); $i < $len; $i++) {
+                $v = $x[$i];
+                if ($f($v)) array_push($r, $v);
+            }
+            return $r;
         };
     }
 
@@ -211,13 +216,15 @@ class FP {
 
     static function and($a): callable {
         return function ($b) use ($a) {
-            return $b && $a;
+            if ($b) return $a;
+            else return $b;
         };
     }
 
     static function or($a): callable {
         return function ($b) use ($a) {
-            return $b || $a;
+            if ($b) return $b;
+            else return $a;
         };
     }
 
@@ -258,21 +265,20 @@ class FP {
         return function (iterable $x) use ($s): string {
             switch (gettype($x)) {
                 case 'array': return implode($s, $x);
-                default: return implode($x, FP::array($x));
+                default: return implode($s, FP::array($x));
             }
         };
     }
 
     static function sort(callable $f): callable {
         return function (iterable $x) use ($f): array {
-            switch (gettype($f)) {
-                case 'array': return usort($x, $f);
-                default: return usort(FP::array($x), $f);
-            }
+            $clone = FP::array($x);
+            usort($clone, $f);
+            return $clone;
         };
     }
 
-    static function reverse(iterable $x): array {
+    static function reverse($x) {
         switch (gettype($x)) {
             case 'array': return array_reverse($x);
             case 'string': return (strrev($x));
@@ -303,7 +309,7 @@ class FP {
     static function swap(array $x, $a, $b): array {
         $c = $x[$a];
         $x[$a] = $x[$b];
-        $x[$b] = $x[$a];
+        $x[$b] = $c;
         return $x;
     }
 
@@ -319,7 +325,7 @@ class FP {
                     array_push($groups[$g], $x);
                 }
                 foreach ($groups as $g => $xs)
-                    $groups[$g] = FP::group(FP::tail($fs))($xs);
+                    $groups[$g] = FP::group(...FP::tail($fs))($xs);
                 return $groups;
             }
         };
@@ -327,7 +333,7 @@ class FP {
 
     static function partition(callable ...$fs): callable {
         $c = count($fs);
-        return function (iterable $xs) use ($fs): array {
+        return function (iterable $xs) use ($fs, $c): array {
             $r = FP::construct(fn() => [], $c);
             foreach ($xs as $x) {
                 $i = 0;
@@ -337,7 +343,7 @@ class FP {
                 }
                 if ($i < $c) array_push($r[$i], $x);
             }
-            return $x;
+            return $r;
         };
     }
 
@@ -372,20 +378,20 @@ class FP {
         };
     }
 
-    static function when(callable $cond): callable {
-        return fn(callable $ok) => fn($x) => $cond($x) ? $ok($x) : $x;
+    static function when(callable $cond, callable $ok): callable {
+        return fn($x) => $cond($x) ? $ok($x) : $x;
     }
 
-    static function maybe(callable $good, callable $bad): callable {
+    static function maybeor(callable $good, callable $bad): callable {
         return fn($x) => $x === null ? $bad($x) : $good($x);
+    }
+
+    static function maybe(callable $f): callable {
+        return fn($x) => $x === null ? $x : $f($x);
     }
 
     static function nothing(callable $f): callable {
         return fn($x) => $x === null ? $f($x) : $x;
-    }
-
-    static function something(callable $f): callable {
-        return fn($x) => $x === null ? $x : $f($x);
     }
 
     static function valmap(...$xs): callable {
@@ -418,9 +424,9 @@ class FP {
         else return $x;
     }
 
-    static function between($low, $high): callable {
-        return function ($x): bool {
-            return $x >= $low && $x <= high;
+    static function between(int $low, int $high): callable {
+        return function ($x) use ($low, $high): bool {
+            return $x >= $low && $x <= $high;
         };
     }
 
