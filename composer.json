@@ -12,5 +12,8 @@
         "psr-4": {
             "FPHP\\": ""
         }
+    },
+    "scripts": {
+        "test": "php test.php"
     }
 }
