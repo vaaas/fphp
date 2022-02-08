@@ -365,8 +365,6 @@ class FP {
         };
     }
 
-    static function defined($x): bool { return $x !== null; }
-
     static function ifelse(callable $cond, callable $ok, callable $bad): callable {
         return function($x) use ($cond, $ok, $bad) {
             if ($cond($x)) return $ok($x);
