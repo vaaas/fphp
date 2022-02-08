@@ -774,4 +774,15 @@ class FP {
             return str_ends_with($x, $prefix);
         };
     }
+
+    static function make_object(...$xs): object {
+        $x = new \stdclass;
+        $len = count($xs);
+        for ($i = 0, $len = count($xs); $i < $len; $i += 2) {
+            $k = $xs[$i];
+            $v = $xs[$i+1];
+            $x->$k = $v;
+        }
+        return $x;
+    }
 }

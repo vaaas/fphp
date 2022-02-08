@@ -48,6 +48,13 @@ function expect_deep_equal($a, $b) {
     else throw new \Exception('expected deep equality');
 }
 
+Test('make_object', function() {
+    $x = new \stdclass;
+    $x->a = 1;
+    $x->b = 2;
+    expect_deep_equal($x, FP::make_object('a', 1, 'b', 2));
+});
+
 Test('K', function() {
     expect_deep_equal(1, FP::K(1)());
     expect_deep_equal(1, FP::K(1)(2));
@@ -118,24 +125,19 @@ Test('set', function() {
 });
 
 Test('get_from', function() {
-    $x = new \stdClass();
-    $x->test = 3;
+    $x = FP::make_object('test', 3);
     expect_deep_equal(3, FP::get_from($x)('test'));
 });
 
 Test('keys', function() {
-    $x = new \stdclass;
-    $x->a = 1;
-    $x->b = 2;
+    $x = FP::make_object('a', 1, 'b', 2);
     $y = [ 'a' => 1, 'b' => 2 ];
     expect_deep_equal(['a', 'b'], FP::array(FP::keys($x)));
     expect_deep_equal(['a', 'b'], FP::array(FP::keys($y)));
 });
 
 Test('entries', function() {
-    $x = new \stdclass;
-    $x->a = 1;
-    $x->b = 2;
+    $x = FP::make_object('a', 1, 'b', 2);
     $y = [ 'a' => 1, 'b' => 2 ];
     expect_deep_equal([['a', 1], ['b', 2]], FP::array(FP::entries($x)));
     expect_deep_equal([['a', 1], ['b', 2]], FP::array(FP::entries($y)));
@@ -163,9 +165,7 @@ Test('alist_to_dictionary', function() {
 });
 
 Test('alist_to_object', function() {
-    $x = new \stdclass;
-    $x->a = 1;
-    $x->b = 2;
+    $x = FP::make_object('a', 1, 'b', 2);
     expect_deep_equal(
         $x,
         FP::alist_to_object([['a', 1], ['b', 2]])
