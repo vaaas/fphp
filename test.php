@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 require "FP.php";
 
 use FPHP\FP;
@@ -111,6 +111,65 @@ Test('do_nothing', function() {
 Test('get', function() {
     expect_deep_equal(1, FP::get(1)([0, 1, 2]));
     expect_deep_equal(1, FP::get('value', 1, 'okay')(['value' => [0, ['okay' => 1 ]]]));
+});
+
+Test('set', function() {
+    expect_deep_equal([1,2,3], FP::set(2)(3)([1,2]));
+});
+
+Test('get_from', function() {
+    $x = new \stdClass();
+    $x->test = 3;
+    expect_deep_equal(3, FP::get_from($x)('test'));
+});
+
+Test('keys', function() {
+    $x = new \stdclass;
+    $x->a = 1;
+    $x->b = 2;
+    $y = [ 'a' => 1, 'b' => 2 ];
+    expect_deep_equal(['a', 'b'], FP::array(FP::keys($x)));
+    expect_deep_equal(['a', 'b'], FP::array(FP::keys($y)));
+});
+
+Test('entries', function() {
+    $x = new \stdclass;
+    $x->a = 1;
+    $x->b = 2;
+    $y = [ 'a' => 1, 'b' => 2 ];
+    expect_deep_equal([['a', 1], ['b', 2]], FP::array(FP::entries($x)));
+    expect_deep_equal([['a', 1], ['b', 2]], FP::array(FP::entries($y)));
+});
+
+Test('change', function() {
+    expect_deep_equal(
+        ['a' => 2, 'b' => 3, 'c' => 3],
+        FP::change(fn($x) => $x + 1, 'a', 'b')(['a' => 1, 'b' => 2, 'c' => 3])
+    );
+});
+
+Test('update', function() {
+    expect_deep_equal(
+        ['a' => 2, 'b' => 2, 'c' => 3],
+        FP::update(['a' => 2, 'b' => 2, 'c' => 666], 'a', 'b')(['a' => 1, 'c' => 3])
+    );
+});
+
+Test('alist_to_dictionary', function() {
+    expect_deep_equal(
+        ['a' => 1, 'b' => 2],
+        FP::alist_to_dictionary([['a', 1], ['b', 2]])
+    );
+});
+
+Test('alist_to_object', function() {
+    $x = new \stdclass;
+    $x->a = 1;
+    $x->b = 2;
+    expect_deep_equal(
+        $x,
+        FP::alist_to_object([['a', 1], ['b', 2]])
+    );
 });
 
 echo "Tests completed\n";

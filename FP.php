@@ -74,11 +74,12 @@ class FP {
 
     static function set($k): callable {
         return function($v) use ($k): callable {
-            return FP::tap(function($o) use ($k, $v) {
+            return function($o) use ($k, $v) {
                 $type = gettype($o);
-                if ($type === 'array') $x = $x[$k] = $v;
-                else if ($type === 'object') $x = $x->$k = $v;
-            });
+                if ($type === 'array') $o[$k] = $v;
+                else if ($type === 'object') $o->$k = $v;
+                return $o;
+            };
         };
     }
 
@@ -92,23 +93,30 @@ class FP {
         };
     }
 
-    static function keys($x): array {
+    static function keys($x): iterable {
         switch (gettype($x)) {
-            case 'array': return array_keys($x);
-            case 'object': return get_object_vars($x);
-            default: return [];
+            case 'array':
+                yield from array_keys($x);
+                break;
+
+            case 'object':
+                foreach ($x as $k => $v)
+                    yield $k;
+                break;
+
+            default:
+                yield from [];
+                break;
         }
     }
 
-    static function entries(iterable $x): array {
-        $r = [];
+    static function entries($x): iterable {
         foreach ($x as $k => $v)
-            array_push($r, [$k, $v]);
-        return $r;
+            yield [$k, $v];
     }
 
     static function change(callable $f, ...$ks): callable {
-        return FP::tap(function($x) use ($f, $ks) {
+        return function($x) use ($f, $ks) {
             if (count($ks) === 0)
                 $ks = FP::keys($x);
             switch (gettype($x)) {
@@ -119,11 +127,12 @@ class FP {
                     foreach ($ks as $k) $x->$k = $f($x->$k);
                     break;
             }
-        });
+            return $x;
+        };
     }
 
     static function update($a, ...$ks): callable {
-        return FP::tap(function($b) use ($a, $ks) {
+        return function($b) use ($a, $ks) {
             if (count($ks) === 0) $ks = FP::keys($a);
             switch (gettype($b)) {
                 case 'array':
@@ -133,7 +142,8 @@ class FP {
                     foreach ($ks as $k) $b[$k] = $a[$k];
                     break;
             }
-        });
+            return $b;
+        };
     }
 
     static function alist_to_dictionary(iterable $xs): array {
@@ -154,25 +164,25 @@ class FP {
 
     static function map_object(callable $f): callable {
         return function(object $x) use ($f): object {
-            return FP::alist_to_object(array_map($f, FP::entries($x)));
+            return FP::alist_to_object(FP::map($f)(FP::entries($x)));
         };
     }
 
     static function map_dictionary(callable $f): callable {
         return function (array $x) use ($f): array {
-            return FP::alist_to_dictionary(array_map($f, FP::entries($x)));
+            return FP::alist_to_dictionary(FP::map($f)(FP::entries($x)));
         };
     }
 
     static function filter_object(callable $f): callable {
         return function (object $x) use ($f): object {
-            return FP::alist_to_object(array_filter(FP::entries($x), $f));
+            return FP::alist_to_object(FP::filter($f)(FP::entries($x)));
         };
     }
 
     static function filter_dictionary(callable $f): callable {
         return function (array $x) use ($f): array {
-            return FP::alist_to_dictionary(array_filter(FP::entries($x), $f));
+            return FP::alist_to_dictionary(FP::filter($f)(FP::entries($x)));
         };
     }
 
@@ -501,9 +511,17 @@ class FP {
                     else return true;
 
                 case 'object':
-                    $f = array_search($x, FP::keys($xs), true);
-                    if ($f === false) return false;
-                    else return true;
+                    if (is_iterable($xs)) {
+                        foreach ($xs as $v)
+                            if ($v === $x)
+                                return true;
+                        return false;
+                    } else {
+                        foreach ($xs as $k => $v)
+                            if ($v === $x)
+                                return true;
+                        return false;
+                    }
             }
         };
     }
