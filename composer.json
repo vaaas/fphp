@@ -2,6 +2,7 @@
     "name": "fphp/fp",
     "description": "functional programming utilities for PHP",
     "type": "library",
+    "license": "AGPL-v3.0",
     "authors": [
         {
             "name": "Vasileios Pasialiokis",
@@ -15,5 +16,8 @@
     },
     "scripts": {
         "test": "php test.php"
+    },
+    "archive": {
+        "exclude": [ "test.php" ]
     }
 }
