@@ -488,10 +488,12 @@ class FP {
         };
     }
 
-    static function clamp($x, $min, $max) {
-        if ($x < $min) return $min;
-        else if ($x > $max) return $max;
-        else return $x;
+    static function clamp($min, $max): callable {
+        return function($x) use ($min, $max) {
+            if ($x < $min) return $min;
+            else if ($x > $max) return $max;
+            else return $x;
+        };
     }
 
     static function signum($x): int {
@@ -522,7 +524,7 @@ class FP {
                         return false;
                     } else {
                         foreach ($xs as $k => $v)
-                            if ($v === $x)
+                            if ($k === $x)
                                 return true;
                         return false;
                     }

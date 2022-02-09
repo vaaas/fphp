@@ -419,4 +419,108 @@ Test('between', function() {
     expect_deep_equal(false, FP::between(1, 3)(4));
 });
 
+Test('gt', function() {
+    expect_deep_equal(1 > 2, FP::gt(2)(1));
+    expect_deep_equal(2 > 1, FP::gt(1)(2));
+});
+
+Test('lt', function() {
+    expect_deep_equal(1 < 2, FP::lt(2)(1));
+    expect_deep_equal(2 < 1, FP::lt(1)(2));
+});
+
+Test('gte', function() {
+    expect_deep_equal(1 >= 2, FP::gte(2)(1));
+    expect_deep_equal(2 >= 1, FP::gte(1)(2));
+    expect_deep_equal(2 >= 2, FP::gte(2)(2));
+});
+
+Test('lte', function() {
+    expect_deep_equal(1 <= 2, FP::lte(2)(1));
+    expect_deep_equal(2 <= 1, FP::lte(1)(2));
+    expect_deep_equal(2 <= 2, FP::lte(2)(2));
+});
+
+Test('divisible', function() {
+    expect_deep_equal((4 % 2) === 0, FP::divisible(2)(4));
+    expect_deep_equal((4 % 3) === 0, FP::divisible(3)(4));
+});
+
+Test('add', function() {
+    expect_deep_equal(4, FP::add(2)(2));
+    expect_deep_equal('hello', FP::add('hel')('lo'));
+    expect_deep_equal([1,2,3], FP::add([1,2])([3]));
+    expect_deep_equal(['a' => 1, 'b' => 2], FP::add(['b' => 2])(['a' => 1]));
+    expect_deep_equal(null, FP::add(3)(null));
+    expect_deep_equal(FP::make_object('a', 1, 'b', 2), FP::add(FP::make_object('b', 2))(FP::make_object('a', 1)));
+});
+
+Test('addr', function() {
+    expect_deep_equal(4, FP::addr(2)(2));
+    expect_deep_equal('lohel', FP::addr('hel')('lo'));
+    expect_deep_equal([3,1,2], FP::addr([1,2])([3]));
+    expect_deep_equal(['a' => 1, 'b' => 2], FP::addr(['b' => 2])(['a' => 1]));
+    expect_deep_equal(null, FP::addr(3)(null));
+    expect_deep_equal(FP::make_object('a', 1, 'b', 2), FP::addr(FP::make_object('b', 2))(FP::make_object('a', 1)));
+});
+
+Test('clamp', function() {
+    expect_deep_equal(2, FP::clamp(1, 3)(2));
+    expect_deep_equal(3, FP::clamp(1, 3)(3));
+    expect_deep_equal(3, FP::clamp(1, 3)(4));
+    expect_deep_equal(1, FP::clamp(1, 3)(-394));
+});
+
+Test('signum', function() {
+    expect_deep_equal(0, FP::signum(0));
+    expect_deep_equal(-1, FP::signum(-1));
+    expect_deep_equal(1, FP::signum(1));
+    expect_deep_equal(1, FP::signum(14839));
+    expect_deep_equal(-1, FP::signum(-14389));
+});
+
+Test('inside', function() {
+    expect_deep_equal(true, FP::inside([1,2,3])(1));
+    expect_deep_equal(false, FP::inside([1,2,3])(4));
+    // expect_deep_equal(true, FP::inside(['a' => 1, 'b' => 2])('b'));
+    expect_deep_equal(true, FP::inside(FP::make_object('a', 1, 'b', 2))('b'));
+    expect_deep_equal(true, FP::inside('zab')('b'));
+});
+
+Test('outside', function() {
+    expect_deep_equal(false, FP::outside([1,2,3])(1));
+    expect_deep_equal(true, FP::outside([1,2,3])(4));
+    // expect_deep_equal(true, FP::outside(['a' => 1, 'b' => 2])('b'));
+    expect_deep_equal(false, FP::outside(FP::make_object('a', 1, 'b', 2))('b'));
+    expect_deep_equal(false, FP::outside('zab')('b'));
+});
+
+Test('has', function() {
+    expect_deep_equal(true, FP::has(1)([1,2,3]));
+    expect_deep_equal(false, FP::has(4)([1,2,3]));
+    // expect_deep_equal(true, FP::has(['a' => 1, 'b' => 2])('b'));
+    expect_deep_equal(true, FP::has('b')(FP::make_object('a', 1, 'b', 2)));
+    expect_deep_equal(true, FP::has('b')('zab'));
+});
+
+Test('hasnt', function() {
+    expect_deep_equal(false, FP::hasnt(1)([1,2,3]));
+    expect_deep_equal(true, FP::hasnt(4)([1,2,3]));
+    // expect_deep_equal(true, FP::hasnt(['a' => 1, 'b' => 2])('b'));
+    expect_deep_equal(false, FP::hasnt('b')(FP::make_object('a', 1, 'b', 2)));
+    expect_deep_equal(false, FP::hasnt('b')('zab'));
+});
+
+Test('flatten', function() {
+    expect_deep_equal([1,2,3,4], FP::array(FP::flatten(2)([ [ [ 1, 2, 3 ] ], [ [ 4 ] ] ])));
+});
+
+Test('flatten_until', function() {
+    expect_deep_equal([1,2,3,4], FP::array(FP::flatten_until(fn($x) => gettype($x) === 'integer')([ [ [ 1, 2, 3 ] ], [ [ 4 ] ] ])));
+});
+
+Test('enumerate', function() {
+    expect_deep_equal([ [ 0, 'a'], [ 1, 'b' ], [ 2, 'c' ] ], FP::array(FP::enumerate(['a', 'b', 'c'])));
+});
+
 echo "Tests completed\n";
