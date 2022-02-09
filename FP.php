@@ -482,6 +482,12 @@ class FP {
         };
     }
 
+    static function mult($a): callable {
+        return function($b) use ($a) {
+            return $a * $b;
+        };
+    }
+
     static function addr($a): callable {
         return function($b) use ($a) {
             return FP::add($b)($a);
@@ -576,43 +582,35 @@ class FP {
         }
     }
 
-    static function foldl(callable $f): callable {
-        return function($i) use ($f): callable {
-            return function(iterable $xs) use ($f, $i) {
-                $a = $i;
-                foreach ($xs as $x) $a = $f($a)($x);
-                return $a;
-            };
+    static function foldl(callable $f, $i): callable {
+        return function(iterable $xs) use ($f, $i) {
+            $a = $i;
+            foreach ($xs as $x) $a = $f($a)($x);
+            return $a;
         };
     }
 
-    static function foldr(callable $f): callable {
-        return function($i) use ($f): callable {
-            return function(iterable $xs) use ($f, $i) {
-                $a = $i;
-                foreach ($xs as $x) $a = $f($x)($a);
-                return $a;
-            };
+    static function foldr(callable $f, $i): callable {
+        return function(iterable $xs) use ($f, $i) {
+            $a = $i;
+            foreach ($xs as $x) $a = $f($x)($a);
+            return $a;
         };
     }
 
-    static function scanl(callable $f): callable {
-        return function($i) use ($f): callable {
-            return function(iterable $xs) use ($f, $i): iterable {
-                $a = $i;
-                foreach ($xs as $x) $a = $f($x)($a);
-                yield $a;
-            };
+    static function scanl(callable $f, $i): callable {
+        return function(iterable $xs) use ($f, $i): iterable {
+            $a = $i;
+            foreach ($xs as $x)
+                yield $a = $f($a)($x);
         };
     }
 
-    static function scanr(callable $f): callable {
-        return function($i) use ($f): callable {
-            return function(iterable $xs) use ($f, $i): iterable {
-                $a = $i;
-                foreach ($xs as $x) $a = $f($x)($a);
-                yield $a;
-            };
+    static function scanr(callable $f, $i): callable {
+        return function(iterable $xs) use ($f, $i): iterable {
+            $a = $i;
+            foreach ($xs as $x)
+                yield $a = $f($x)($a);
         };
     }
 
@@ -689,7 +687,7 @@ class FP {
     }
 
     static function limit(int $n): callable {
-        return function (iterable $xs): iterable {
+        return function (iterable $xs) use ($n): iterable {
             $i = 0;
             foreach ($xs as $x) {
                 yield $x;
@@ -700,7 +698,7 @@ class FP {
     }
 
     static function sum(iterable $xs): int {
-        return FP::foldr(fn($a) => fn($b) => $a+$b)(0);
+        return FP::foldr(fn($a) => fn($b) => $a+$b, 0)($xs);
     }
 
     static function len($x): int {
@@ -770,14 +768,14 @@ class FP {
     }
 
     static function starts_with(string $prefix): callable {
-        return function (string $x): bool {
+        return function (string $x) use ($prefix): bool {
             return str_starts_with($x, $prefix);
         };
     }
 
-    static function ends_with(string $prefix): callable {
-        return function (string $x): bool {
-            return str_ends_with($x, $prefix);
+    static function ends_with(string $suffix): callable {
+        return function (string $x) use ($suffix): bool {
+            return str_ends_with($x, $suffix);
         };
     }
 

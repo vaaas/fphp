@@ -523,4 +523,149 @@ Test('enumerate', function() {
     expect_deep_equal([ [ 0, 'a'], [ 1, 'b' ], [ 2, 'c' ] ], FP::array(FP::enumerate(['a', 'b', 'c'])));
 });
 
+Test('foldl', function() {
+    expect_deep_equal(6, FP::foldl([FP::class, 'add'], 0)([1,2,3]));
+    expect_deep_equal('abc', FP::foldl([FP::class, 'add'], '')(['a', 'b', 'c']));
+});
+
+Test('foldr', function() {
+    expect_deep_equal(6, FP::foldr([FP::class, 'add'], 0)([1,2,3]));
+    expect_deep_equal('cba', FP::foldr([FP::class, 'add'], '')(['a', 'b', 'c']));
+});
+
+Test('scanl', function() {
+    expect_deep_equal([1, 3, 6],
+        FP::array(
+            FP::scanl([FP::class, 'add'], 0)([1,2,3])));
+    expect_deep_equal(['a', 'ab', 'abc'],
+        FP::array(
+            FP::scanl([FP::class, 'add'], '')(['a', 'b', 'c'])));
+});
+
+Test('scanr', function() {
+    expect_deep_equal([1, 3, 6],
+        FP::array(
+            FP::scanr([FP::class, 'add'], 0)([1,2,3])));
+    expect_deep_equal(['a', 'ba', 'cba'],
+        FP::array(
+            FP::scanr([FP::class, 'add'], '')(['a', 'b', 'c'])));
+});
+
+Test('map', function() {
+    expect_deep_equal([1,2,3],
+        FP::array(
+            FP::map(FP::add(1))([0,1,2])));
+});
+
+Test('filter', function() {
+    expect_deep_equal([0, 2],
+        FP::array(
+            FP::filter(FP::divisible(2))([0,1,2,3])));
+});
+
+Test('find', function() {
+    expect_deep_equal('yo',
+        FP::find(FP::is('yo'))(['bro', 'yo']));
+    expect_deep_equal(null,
+        FP::find(FP::is(1))(['bro', 'yo']));
+});
+
+Test('find_index', function() {
+    expect_deep_equal(1,
+        FP::find_index(FP::is('yo'))(['bro', 'yo']));
+    expect_deep_equal(null,
+        FP::find_index(FP::is(1))(['bro', 'yo']));
+});
+
+Test('every', function() {
+    expect_deep_equal(true,
+        FP::every(fn($x) => gettype($x) === 'string')(['a', 'b', 'c']));
+    expect_deep_equal(false,
+        FP::every(fn($x) => gettype($x) === 'string')(['a', 'b', 2]));
+});
+
+Test('some', function() {
+    expect_deep_equal(true,
+        FP::some(fn($x) => gettype($x) === 'string')(['a', 1, 2]));
+    expect_deep_equal(false,
+        FP::some(fn($x) => gettype($x) === 'string')([0, 1, 2]));
+});
+
+Test('seq', function() {
+    expect_deep_equal([0,1,2], FP::array(FP::seq(0, 2)));
+});
+
+Test('each', function() {
+    expect_deep_equal([0,1,2], FP::each(fn($x) => $x)([0,1,2]));
+});
+
+Test('apply', function() {
+    expect_deep_equal(
+        [2, '1', 10],
+        FP::apply([FP::add(1), fn($x) => "{$x}", FP::mult(10)])(1));
+});
+
+Test('limit', function() {
+    $test = function() {
+        $i = 1;
+        while (true) {
+            yield $i;
+            $i++;
+        }
+    };
+
+    expect_deep_equal(
+        [1, 2, 3],
+        FP::array(FP::limit(3)($test())));
+});
+
+Test('sum', function() {
+    expect_deep_equal(6, FP::sum([1,2,3]));
+});
+
+Test('len', function() {
+    expect_deep_equal(3, FP::len('abc'));
+    expect_deep_equal(10, FP::len([0,1,2,3,4,5,6,7,8,9]));
+    expect_deep_equal(2, FP::len(FP::make_object('a', 1, 'b', 2)));
+});
+
+Test('empty', function() {
+    expect_deep_equal(true, FP::empty(''));
+    expect_deep_equal(true, FP::empty([]));
+    expect_deep_equal(true, FP::empty(new \stdclass));
+    expect_deep_equal(false, FP::empty([1]));
+});
+
+Test('nonempty', function() {
+    expect_deep_equal(false, FP::nonempty(''));
+    expect_deep_equal(false, FP::nonempty([]));
+    expect_deep_equal(false, FP::nonempty(new \stdclass));
+    expect_deep_equal(true, FP::nonempty([1]));
+});
+
+Test('average', function() {
+    expect_deep_equal(2, FP::average([1,2,3]));
+});
+
+Test('count', function() {
+    expect_deep_equal(
+        ['a' => 2, 'b' => 1],
+        FP::count(['a', 'b', 'a']));
+});
+
+Test('plist_to_alist', function() {
+    expect_deep_equal(
+        [['a', 1], ['b', 2]],
+        FP::array(FP::plist_to_alist(['a', 1, 'b', 2])));
+});
+
+Test('split', function() {
+    expect_deep_equal(['a', 'b', 'c'], FP::split(' ')('a b c'));
+});
+
+Test('starts_with', function() {
+    expect_deep_equal(true, FP::starts_with('www.')('www.google.com'));
+    expect_deep_equal(false, FP::starts_with('test.')('www.google.com'));
+});
+
 echo "Tests completed\n";
