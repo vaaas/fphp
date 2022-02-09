@@ -668,4 +668,12 @@ Test('starts_with', function() {
     expect_deep_equal(false, FP::starts_with('test.')('www.google.com'));
 });
 
+Test('distinct', function() {
+    expect_deep_equal([0, 1], FP::distinct([0,0,0,0,1,1,0,0,1]));
+});
+
+Test('slice', function() {
+    expect_deep_equal([1,2,3], FP::slice(1,4)([0,1,2,3,4]));
+});
+
 echo "Tests completed\n";

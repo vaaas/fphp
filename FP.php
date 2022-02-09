@@ -248,6 +248,12 @@ class FP {
         return array_slice($x, 1);
     }
 
+    static function slice(int $from, int $to): callable {
+        return function(array $xs) use ($from, $to): array {
+            return array_slice($xs, $from, $to - $from);
+        };
+    }
+
     static function construct(callable $f, int $n=1): array {
         $x = [];
         for ($i = 0; $i < $n; $i++)
@@ -788,5 +794,11 @@ class FP {
             $x->$k = $v;
         }
         return $x;
+    }
+
+    static function distinct(iterable $xs): array {
+        $r = [];
+        foreach ($xs as $x) $r[$x] = true;
+        return array_keys($r);
     }
 }
