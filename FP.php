@@ -678,7 +678,7 @@ class FP {
 
     static function each(callable $f): callable {
         return function(iterable $xs) use ($f): iterable {
-            foreach ($xs as $i=>$x)
+            foreach ($xs as $i => $x)
                 $f($x, $i, $xs);
             return $xs;
         };
