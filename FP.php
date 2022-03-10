@@ -319,8 +319,8 @@ class FP {
         return $x;
     }
 
-    static function group(callable ...$fs): callable {
-        return function ($xs) use ($fs): array {
+    static function group(callable $pluck, callable ...$fs): callable {
+        return function ($xs) use ($pluck, $fs): array {
             if (count($fs) === 0) return $xs;
             else {
                 $f = $fs[0];
@@ -328,10 +328,10 @@ class FP {
                 foreach ($xs as $x) {
                     $g = $f($x);
                     if (!array_key_exists($g, $groups)) $groups[$g] = [];
-                    array_push($groups[$g], $x);
+                    array_push($groups[$g], $pluck($x));
                 }
                 foreach ($groups as $g => $xs)
-                    $groups[$g] = FP::group(...FP::tail($fs))($xs);
+                    $groups[$g] = FP::group($pluck, ...FP::tail($fs))($xs);
                 return $groups;
             }
         };

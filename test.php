@@ -335,7 +335,7 @@ Test('group', function() {
 
     expect_deep_equal(
         $out,
-        FP::group(fn($x) => $x['size'])($in)
+        FP::group(fn($x) => $x, fn($x) => $x['size'])($in)
     );
 });
 
