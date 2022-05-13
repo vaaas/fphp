@@ -353,6 +353,20 @@ class FP {
         };
     }
 
+    static function boolean_partition(callable $f): callable {
+        return function (iterable $xs) use ($f): array {
+            $trues = [];
+            $falses = [];
+            foreach ($xs as $x) {
+                if ($f($x))
+                    array_push($trues, $x);
+                else
+                    array_push($falses, $x);
+            }
+            return [$trues, $falses];
+        }
+    }
+
     static function is($a): callable {
         return function($b) use ($a): bool {
             return $a === $b;
