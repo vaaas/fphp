@@ -364,7 +364,7 @@ class FP {
                     array_push($falses, $x);
             }
             return [$trues, $falses];
-        }
+        };
     }
 
     static function is($a): callable {
