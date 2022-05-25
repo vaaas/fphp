@@ -815,4 +815,10 @@ class FP {
         foreach ($xs as $x) $r[$x] = true;
         return array_keys($r);
     }
+
+    static function regex_test(string $regex): callable {
+        return function(string $x): bool {
+            return preg_match($regex, $x) === 1 ? true : false;
+        };
+    }
 }
