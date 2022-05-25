@@ -817,7 +817,7 @@ class FP {
     }
 
     static function regex_test(string $regex): callable {
-        return function(string $x): bool {
+        return function(string $x) use ($regex): bool {
             return preg_match($regex, $x) === 1 ? true : false;
         };
     }
